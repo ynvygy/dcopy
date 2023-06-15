@@ -5,7 +5,7 @@ const axios = require("axios");
 export default function List({decode}) {
   const API_KEY = 'JKDHQNED6KA3U4R935QFGXZD4ZJRG1VIQZ';
   //const address = '0x3e702E39e0649bd8581D07a5bf1b9e5924d94Ce0';
-  const address = '0x965b1a0b5b56b113253678b4b04da469d1316ce4';
+  const [address, setAddress] = useState("");
   const [transactions, setTransactions] = useState([]);
   const [decodedList, setDecodedList] = useState([]);
 
@@ -35,38 +35,52 @@ export default function List({decode}) {
     }
   };
 
+  const handleAddressChange = (event) => {
+    setAddress(event.target.value);
+  };
+
 	return (
     <div>
+      <input
+        type="text"
+        value={address}
+        onChange={handleAddressChange}
+        placeholder="Enter an address"
+      />
+      <p>For demo purposes: 0x965b1a0b5b56b113253678b4b04da469d1316ce4</p>
       <button onClick={handleFetchTransactions}>Fetch Transactions</button>
-      <table>
-        <thead>
-          <tr>
-            <th>Tx Hash</th>
-            <th>Type</th>
-            <th>Token</th>
-            <th>Value</th>
-          </tr>
-        </thead>
-        <tbody>
-          {transactions.map((tx, index) => (
-            (decodedList[index]['params'].length === 5) ? (
-              <tr key={index}>
-                <td>{tx.hash}</td>
-                <td>Sold </td>
-                <td>{decodedList[index]['params'][2]['value'][0]}</td>
-                <td>{ethers.utils.formatUnits(decodedList[index]['params'][1]['value'], 'ether').slice(0,7)} ETH</td>
+      <div>
+        {transactions.length > 0  && <table>
+            <thead>
+              <tr>
+                <th>Tx Hash</th>
+                <th>Type</th>
+                <th>Token</th>
+                <th>Value</th>
               </tr>
-            ) : (
-              <tr key={index}>
-                <td>{tx.hash}</td>
-                <td>Bought</td>
-                <td>{decodedList[index]['params'][1]['value'][1]}</td>
-                <td>{ethers.utils.formatUnits(tx['value'], 'ether').slice(0,7)} ETH</td>
-              </tr>
-            )
-          ))}
-        </tbody>
-      </table>
+            </thead>
+            <tbody>
+              {transactions.map((tx, index) => (
+                (decodedList[index]['params'].length === 5) ? (
+                  <tr key={index}>
+                    <td>{tx.hash}</td>
+                    <td>Sold </td>
+                    <td>{decodedList[index]['params'][2]['value'][0]}</td>
+                    <td>{ethers.utils.formatUnits(decodedList[index]['params'][1]['value'], 'ether').slice(0,7)} ETH</td>
+                  </tr>
+                ) : (
+                  <tr key={index}>
+                    <td>{tx.hash}</td>
+                    <td>Bought</td>
+                    <td>{decodedList[index]['params'][1]['value'][1]}</td>
+                    <td>{ethers.utils.formatUnits(tx['value'], 'ether').slice(0,7)} ETH</td>
+                  </tr>
+                )
+              ))}
+            </tbody>
+          </table>
+        }
+        </div>
       <ul>
           {/*
           {transactions.map((tx, index) => (

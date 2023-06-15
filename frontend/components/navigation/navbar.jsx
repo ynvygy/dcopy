@@ -1,11 +1,24 @@
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import React, { useState } from 'react';
 import styles from "../../styles/Navbar.module.css";
+
 export default function Navbar() {
+	const [isLogoClicked, setIsLogoClicked] = useState(false);
+
+	const handleLogoClick = () => {
+		event.preventDefault();
+    setIsLogoClicked(!isLogoClicked);
+  };
+
 	return (
 		<nav className={styles.navbar}>
-			<a href="https://alchemy.com/?a=create-web3-dapp" target={"_blank"}>
-				<img className={styles.alchemy_logo} src="/cw3d-logo.png"></img>
-			</a>
+      <a href="#" target="_blank" onClick={handleLogoClick}>
+        <img
+          className={`${styles.alchemy_logo} ${isLogoClicked ? styles.enlarged : ''}`}
+          src="/logo.png"
+          alt="Logo"
+        />
+      </a>
 			<ConnectButton></ConnectButton>
 		</nav>
 	);

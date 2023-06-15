@@ -3,6 +3,7 @@ import Router, { useRouter } from "next/router";
 const ethers = require("ethers"); // Ethereum library for interacting with the blockchain
 const abi = require("./uniswap-abi.json"); // ABI (Application Binary Interface) for the smart contract
 const tokenSwapContractABI = require("./tokenSwapAbi.json");
+const ierc20ABI = require("./ierc20-abi.json")
 const axios = require("axios"); // HTTP client library for making API requests
 const abiDecoder = require("abi-decoder"); // Library for decoding transaction data
 import { useEffect, useState } from "react";
@@ -12,7 +13,7 @@ import List from "./List"
 const router = "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D";
 
 //const wssUrl = 'wssurl'
-const wssUrl = 'wss'
+
 
 abiDecoder.addABI(abi);
 
@@ -38,10 +39,12 @@ export default function Dcopy() {
 	const [transactionList, setTransactionList] = useState([]);
 	const [decodedList, setDecodedList] = useState([]);
 
-	const goerli_provider = new ethers.providers.JsonRpcProvider('https://eth-goerli.g.alchemy.com/v2/KEY');
+	//const goerli_provider = new ethers.providers.JsonRpcProvider('https://eth-goerli.g.alchemy.com/v2/ALCHEMY_KEY');
 	const tokenSwapAddress = '0x6073e41DF217B86bfDD5C910A7AFfc1c68D4BeDB'
+	const wethAddress = '0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6'
 
 	const tokenSwapContract = new ethers.Contract(tokenSwapAddress, tokenSwapContractABI, signer);
+	const wethContract = new ethers.Contract(wethAddress, ierc20ABI, signer);
 
 	async function main() {
 		if (!stop) {
@@ -106,17 +109,14 @@ export default function Dcopy() {
     const to = '0x965b1a0b5b56b113253678b4b04da469d1316ce4'; 
 
     try {
+			const approveTx = await wethContract.connect(signer).approve(tokenSwapAddress, '1');
+
+			await approveTx.wait();
+
 			const swapTx = await tokenSwapContract.connect(signer)
 				.swap(tokenIn, tokenOut, amountMin, amountOutMin, to)
 			
 			await swapTx.wait();
-      //const privateKey = 'YOUR_PRIVATE_KEY'; // Replace with your private key
-      //const wallet = new ethers.Wallet(privateKey, goerli_provider);
-      //const contractWithSigner = contract.connect(wallet);
-
-      //await contractWithSigner.tokenSwap(param1, param2, param3, param4, param5);
-
-      // Transaction successful, handle the result or show a success message
     } catch (error) {
       // Handle error, display an error message, or perform other actions
       console.error('Error:', error);
