@@ -3,7 +3,7 @@ import { ethers } from "ethers";
 const axios = require("axios");
 
 export default function List({decode}) {
-  const API_KEY = 'JKDHQNED6KA3U4R935QFGXZD4ZJRG1VIQZ';
+  const API_KEY = 
   //const address = '0x3e702E39e0649bd8581D07a5bf1b9e5924d94Ce0';
   const [address, setAddress] = useState("");
   const [transactions, setTransactions] = useState([]);
@@ -41,14 +41,18 @@ export default function List({decode}) {
 
 	return (
     <div>
-      <input
-        type="text"
-        value={address}
-        onChange={handleAddressChange}
-        placeholder="Enter an address"
-      />
-      <p>For demo purposes: 0x965b1a0b5b56b113253678b4b04da469d1316ce4</p>
-      <button onClick={handleFetchTransactions}>Fetch Transactions</button>
+      <div>
+        <h4>Address transactions</h4>
+        <br/>
+        <input
+          type="text"
+          value={address}
+          onChange={handleAddressChange}
+          placeholder="Enter an address"
+        />
+        <p>For demo purposes: 0x965b1a0b5b56b113253678b4b04da469d1316ce4</p>
+        <button onClick={handleFetchTransactions}>Fetch Transactions</button>
+      </div>
       <div>
         {transactions.length > 0  && <table>
             <thead>
@@ -81,21 +85,6 @@ export default function List({decode}) {
           </table>
         }
         </div>
-      <ul>
-          {/*
-          {transactions.map((tx, index) => (
-            (decodedList[index]['params'].length === 5) ? 
-              (<li key={index}>{tx.hash} - {decodedList[index]['params'][2]['value'][0]} - {decodedList[index]['params'][2]['value'][1]} - {decodedList[index]['params'][0]['value']} - {decodedList[index]['params'][1]['value']}</li>)
-              : (<li key={index}>{tx.hash} - {decodedList[index]['params'][1]['value'][0]} - {decodedList[index]['params'][1]['value'][1]} - {decodedList[index]['params'][0]['value']} - {tx['value']}</li>)
-          ))}ethers.utils.formatUnits(valueInGwei, 'gwei');
-          
-          {transactions.map((tx, index) => (
-            (decodedList[index]['params'].length === 5) ? 
-              (<li key={index}>{tx.hash} - Sold {decodedList[index]['params'][2]['value'][0]} for {ethers.utils.formatUnits(decodedList[index]['params'][1]['value'], 'ether')} ETH</li>)
-              : (<li key={index}>{tx.hash} - Bought {decodedList[index]['params'][1]['value'][1]} for {ethers.utils.formatUnits(tx['value'], 'ether')} ETH</li>)
-          ))}
-          */}
-        </ul>
     </div>
   );
 }

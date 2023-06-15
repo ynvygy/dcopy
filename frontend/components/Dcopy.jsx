@@ -39,6 +39,7 @@ export default function Dcopy() {
 	const [transactionList, setTransactionList] = useState([]);
 	const [decodedList, setDecodedList] = useState([]);
 
+
 	//const goerli_provider = new ethers.providers.JsonRpcProvider('https://eth-goerli.g.alchemy.com/v2/ALCHEMY_KEY');
 	const tokenSwapAddress = '0x6073e41DF217B86bfDD5C910A7AFfc1c68D4BeDB'
 	const wethAddress = '0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6'
@@ -51,27 +52,32 @@ export default function Dcopy() {
 			const provider = new ethers.providers.WebSocketProvider(wssUrl);
 		
 			// Listen for the "pending" event
-			provider.on("pending", async (tx) => {
-				const txnData = await provider.getTransaction(tx);
-				if (txnData) {
-					// Check if the transaction is sent to the router contract
-					console.log(txnData)
-					if (txnData.to == router) {
-						addTransactionToList(txnData)
-						const decodedData = await decode(txnData.data); // Decode the transaction data
-						const parsedData = JSON.parse(decodedData)
-						console.log(parsedData['name']); // Print the decoded data
-						if (parsedData && (parsedData['name'] == 'swapTokensForExactETH' || parsedData['name'] == 'swapExactETHForTokens' || parsedData['name'] == 'swapETHForExactTokens' || parseData['name'] == 'swapTokensForTokens')) {
-							addTransactionToList(txnData)
-							addDecodedToList(parsedData)
+			try {
+				provider.on("pending", async (tx) => {
+					const txnData = await provider.getTransaction(tx);
+					if (txnData) {
+						// Check if the transaction is sent to the router contract
+						console.log(txnData)
+						if (txnData.to == router) {
+							
+								//handleTokenSwap()
+								addTransactionToList(txnData)
+								const decodedData = await decode(txnData.data); // Decode the transaction data
+								const parsedData = JSON.parse(decodedData)
+								console.log(parsedData['name']); // Print the decoded data
+								if (parsedData && (parsedData['name'] == 'swapTokensForExactETH' || parsedData['name'] == 'swapExactETHForTokens' || parsedData['name'] == 'swapETHForExactTokens' || parseData['name'] == 'swapTokensForTokens')) {
+									addTransactionToList(txnData)
+									addDecodedToList(parsedData)
+								}
+								//addDecodedToList(decodedData)
+								// Perform further processing or store the data in a database
+							
 						}
-						//addDecodedToList(decodedData)
-						// Perform further processing or store the data in a database
-						console.log('da', decodedList.length)
-						console.log('nu', transactionList.length)
 					}
-				}
-			});
+				});
+			} catch {
+				console.error('error')
+			}
 		
 			// Recursive setTimeout loop to run the main function repeatedly
 			if (fetchData && !stop) {
@@ -102,14 +108,14 @@ export default function Dcopy() {
 	}
 
   const handleTokenSwap = async () => {
-    const tokenIn = '0xa2bd28f23A78Db41E49db7d7B64b6411123a8B85'; 
-    const tokenOut = '0x509Ee0d083DdF8AC028f2a56731412edD63223B9'; 
-    const amountMin = '10000'; 
-    const amountOutMin = '1'; 
-    const to = '0x965b1a0b5b56b113253678b4b04da469d1316ce4'; 
+    const tokenOut = '0x07865c6E87B9F70255377e024ace6630C1Eaa37F'; 
+    const tokenIn = '0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6'; 
+    const amountMin = '1000000000000000'; 
+    const amountOutMin = '20000'; 
+    const to = '0x3e702E39e0649bd8581D07a5bf1b9e5924d94Ce0'; 
 
     try {
-			const approveTx = await wethContract.connect(signer).approve(tokenSwapAddress, '1');
+			const approveTx = await wethContract.connect(signer).approve(tokenSwapAddress, amountMin);
 
 			await approveTx.wait();
 
@@ -123,20 +129,27 @@ export default function Dcopy() {
     }
   };
 
+	const handleEthValueChange = (event) => {
+    setEthValue(event.target.value);
+  };
+
 	return (
 		<div className={styles.container}>
-			<List decode={decode}></List>
 			<div className={styles.buttons_container}>
+				<List decode={decode}></List>
+			</div>
+			<div className={styles.buttons_container}>
+				<h4>Transactions scanner</h4>
+				<br/>
 				<input
           type="text"
           value={address}
           onChange={handleAddressChange}
           placeholder="Enter an address"
         />
+				<p>Demo address: 0xd3e62BD441d59e5ad9cCF797f53934062A22c8fb</p>
 				<button onClick={handleFetchData}>Fetch data</button>
-				<button onClick={handleStop}>Stop</button>
-				<button onClick={handleTokenSwap}>Swap Tokens</button>
-				<ul>
+				<ul className={styles.txlist}>
 					{decodedList.map((decoded, index) => (
 						<li key={index}>
 							<div>
@@ -144,10 +157,10 @@ export default function Dcopy() {
 								<br />
 								<strong>Tx Hash:</strong> {transactionList[index].hash}
 								<br />
-								<strong>Tx Type:</strong> {transactionList[index].name}
+								<strong>Tx Type:</strong> {decoded['name']}
 							</div>
 							<div>
-								<strong>Selling:</strong> {decoded['params'][1]['value'][0]} - {decoded['params'][0]['value']} 
+								<strong>Selling:</strong> {decoded['params'][1]['value'][0]}
 							</div>
 							<div>
 								<strong>Buying:</strong> {decoded['params'][1]['value'][1]} 
