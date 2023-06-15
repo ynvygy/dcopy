@@ -36,3 +36,9 @@ a {
 	html {
 	}
 }
+
+th,
+td {
+  padding-left: 10px; /* Adjust the value as needed */
+	padding-top: 3px
+}

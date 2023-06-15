@@ -1,12 +1,12 @@
 const hre = require("hardhat");
 
 async function main() {
-	const Contract = await hre.ethers.getContractFactory("MyContract");
+	const Contract = await hre.ethers.getContractFactory("TokenSwap");
 	const contract = await Contract.deploy();
 
 	await contract.deployed();
 
-	console.log("MyContract deployed to:", contract.address);
+	console.log("TokenSwap deployed to:", contract.address);
 }
 
 main().catch((error) => {
